@@ -41,15 +41,19 @@ export class StateMachine<S extends State, T extends StateTransition<S>> {
     return this.state;
   }
 
-  public transition(from: S, to: S): Result<S> {
+  public transition(to: S): Result<S> {
     const transition = this.transitions.find((t) => {
-      if (t.from && !t.from.includes(from)) {
-        return false;
+      if (t.from) {
+        if (!this.state) return false;
+        return t.from.includes(this.state);
       }
       return t.to === to;
     });
     if (!transition) {
-      return { success: false, error: `Invalid transition from ${from} to ${to}` };
+      return {
+        success: false,
+        error: `Invalid transition from ${this.currentState ?? "none"} to ${to}`,
+      };
     }
 
     this.state = to;

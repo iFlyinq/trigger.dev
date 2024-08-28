@@ -9,7 +9,7 @@ describe("Run state machine", () => {
 
   it("should transition from PENDING to CANCELED", () => {
     runMachine.setInitialState("PENDING");
-    const result = runMachine.transition("PENDING", "CANCELED");
+    const result = runMachine.transition("CANCELED");
     expect(result.success).toBe(true);
     if (!result.success) {
       fail("Expected transition to be successful");
@@ -20,7 +20,7 @@ describe("Run state machine", () => {
 
   it("Should not transition from CANCELED to PENDING", () => {
     runMachine.setInitialState("CANCELED");
-    const result = runMachine.transition("CANCELED", "PENDING");
+    const result = runMachine.transition("PENDING");
     expect(result.success).toBe(false);
     expect(runMachine.currentState).toBe("CANCELED");
   });
