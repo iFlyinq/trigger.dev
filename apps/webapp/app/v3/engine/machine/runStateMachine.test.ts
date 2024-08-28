@@ -25,3 +25,5 @@ describe("Run state machine", () => {
     expect(runMachine.currentState).toBe("CANCELED");
   });
 });
+
+//todo how to ensure attempt statuses are also correct?

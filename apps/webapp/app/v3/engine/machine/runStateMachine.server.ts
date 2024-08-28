@@ -1,17 +1,22 @@
-import { TaskRunStatus } from "@trigger.dev/database";
-import { StateMachine, StateTransition } from "./stateMachine.server";
+import { TaskRunAttemptStatus, TaskRunStatus } from "@trigger.dev/database";
+import { PossibleTransitionIds, StateMachine, StateTransition } from "./stateMachine.server";
 
-const cancelRun: StateTransition<TaskRunStatus> = {
+export const cancelRun: StateTransition<TaskRunStatus> = {
+  id: "cancel" as const,
   from: ["PENDING"],
   to: "CANCELED",
 };
 
-const expireRun: StateTransition<TaskRunStatus> = {
+type T = (typeof cancelRun)["id"];
+
+export const expireRun: StateTransition<TaskRunStatus> = {
+  id: "expire",
   from: ["PENDING"],
   to: "EXPIRED",
 };
 
-const executeRun: StateTransition<TaskRunStatus> = {
+export const executeRun: StateTransition<TaskRunStatus> = {
+  id: "execute",
   from: ["PENDING"],
   to: "EXECUTING",
 };
@@ -35,3 +40,22 @@ export const runMachine = new StateMachine(
   ],
   [cancelRun, expireRun, executeRun]
 );
+
+export type RunTransitionIds = PossibleTransitionIds<typeof runMachine>;
+
+//todo could be Zod schemas instead so we can have types?
+//would be used to only allow writing to the database if the state is correct
+export type State = {
+  run: TaskRunStatus;
+  attempt: (TaskRunAttemptStatus | null)[];
+};
+
+const pending: State = {
+  run: "PENDING",
+  attempt: [null],
+};
+
+const executing: State = {
+  run: "EXECUTING",
+  attempt: [null, "EXECUTING"],
+};

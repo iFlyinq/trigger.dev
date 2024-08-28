@@ -1,11 +1,10 @@
-import { TaskRunAttemptStatus, TaskRunStatus } from "@trigger.dev/database";
-
 type State = string;
 
-export type StateTransition<S extends State> = {
+export type StateTransition<S extends State, I extends string = string> = {
+  id: I;
   /** States it can transition from.
    * If undefined it can move from any state. */
-  from?: S[];
+  from?: readonly S[];
   /** States it transitions to */
   to: S;
 };
@@ -20,7 +19,7 @@ type Result<S extends State> =
       error: string;
     };
 
-export class StateMachine<S extends State, T extends StateTransition<S>> {
+export class StateMachine<S extends State, I extends string, T extends StateTransition<S, I>> {
   private states: readonly S[];
   private transitions: T[];
   private state?: S;
@@ -39,6 +38,10 @@ export class StateMachine<S extends State, T extends StateTransition<S>> {
 
   public get currentState() {
     return this.state;
+  }
+
+  public get allTransitions() {
+    return this.transitions;
   }
 
   public transition(to: S): Result<S> {
@@ -60,3 +63,19 @@ export class StateMachine<S extends State, T extends StateTransition<S>> {
     return { success: true, state: to };
   }
 }
+
+export type PossibleTransitions<M extends StateMachine<any, any, any>> = M extends StateMachine<
+  infer S,
+  infer I,
+  infer T
+>
+  ? T
+  : never;
+
+export type PossibleTransitionIds<M extends StateMachine<any, any, any>> = M extends StateMachine<
+  infer S,
+  infer I,
+  infer T
+>
+  ? I
+  : never;

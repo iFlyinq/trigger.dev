@@ -1,5 +1,5 @@
 import { TaskRunStatus } from "@trigger.dev/database";
-import { runMachine } from "./runStateMachine.server";
+import { runMachine, RunTransitionIds } from "./runStateMachine.server";
 
 export class RunEngine {
   machine = runMachine;
@@ -13,4 +13,8 @@ export class RunEngine {
     // return result.success;
     return true;
   }
+}
+
+export interface RunTransition {
+  transition: RunTransitionIds;
 }
