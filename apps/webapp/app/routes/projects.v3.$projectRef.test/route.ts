@@ -1,6 +1,7 @@
 import { LoaderFunctionArgs, redirect } from "@remix-run/server-runtime";
 import { z } from "zod";
 import { prisma } from "~/db.server";
+import { logger } from "~/services/logger.server";
 import { requireUserId } from "~/services/session.server";
 
 const ParamsSchema = z.object({
@@ -9,6 +10,10 @@ const ParamsSchema = z.object({
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
   const userId = await requireUserId(request);
+
+  logger.debug("Redirecting to new test page", {
+    projectRef: params.projectRef,
+  });
 
   const validatedParams = ParamsSchema.parse(params);
 
